@@ -4,7 +4,7 @@
 int main()
 {
     cv::Mat image=cv::imread("F:/gaze/helmet_light_cali_image/7.5405/left/test/1/91yy.png");
-    SphereImage si;
+    SphereImage si(8);
     si.DetectCenter(image);
     return 0;
 }
