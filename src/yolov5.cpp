@@ -29,22 +29,22 @@ cv::Mat YOLOv5::ResizeImage(cv::Mat srcimg, int *newh, int *neww, int *top, int 
 	cv::Mat dstimg;                 // 定义一个目标源
 	if (m_keepRatio && srch != srcw) 
     {  // 高宽不等
-		float hw_scale = (float)srch / srcw; // 保存比列
+		float hw_scale = static_cast<float>(srch) / srcw; // 保存比列
 		if (hw_scale > 1) 
         {     // 按照yolov5的预处理进行处理
 			*newh = m_inpHeight;
-			*neww = int(m_inpWidth / hw_scale); // 
+			*neww = static_cast<int>(m_inpWidth / hw_scale); // 
 			resize(srcimg, dstimg, cv::Size(*neww, *newh), cv::INTER_AREA);
-			*left = int((m_inpWidth - *neww) * 0.5);
+			*left = static_cast<int>((m_inpWidth - *neww) * 0.5);
             // 和yolov5的处理对应,没有进行32的取模运算,这个是用114像素填充到(640,640)了,最后输入还是640,640
 			copyMakeBorder(dstimg, dstimg, 0, 0, *left, m_inpWidth - *neww - *left, cv::BORDER_CONSTANT, 114);
 		}
 		else 
         {
-			*newh = (int)m_inpHeight * hw_scale;
+			*newh = static_cast<int>(m_inpHeight * hw_scale);
 			*neww = m_inpWidth;
 			resize(srcimg, dstimg, cv::Size(*neww, *newh), cv::INTER_AREA);	
-			*top = (int)(m_inpHeight - *newh) * 0.5;
+			*top = static_cast<int>(m_inpHeight - *newh) * 0.5;
 			copyMakeBorder(dstimg, dstimg, *top, m_inpHeight - *newh - *top, 0, 0, cv::BORDER_CONSTANT, 114);
 		}
 	}
@@ -75,8 +75,8 @@ std::vector<cv::Rect> YOLOv5::Detect(cv::Mat frame)
 	std::vector<float> confidences;
 	std::vector<cv::Rect> boxes;    //  opencv里保存box的
 	std::vector<int> classIds;
-	float ratioh = (float)frame.rows / newh, ratiow = (float)frame.cols / neww;
-	float* pdata = (float*)outs[0].data;  // 定义浮点型指针，
+	float ratioh = static_cast<float>(frame.rows) / newh, ratiow = static_cast<float>(frame.cols) / neww;
+	float* pdata = reinterpret_cast<float*>(outs[0].data);  // 定义浮点型指针，
 	for(int i = 0; i < num_proposal; ++i) // 遍历所有的num_pre_boxes
 	{
 		int index = i * out_dim2;      // prob[b*num_pred_boxes*(classes+5)]  
@@ -103,8 +103,8 @@ std::vector<cv::Rect> YOLOv5::Detect(cv::Mat frame)
 				int left = int((cx - padw - 0.5 * w)*ratiow);  // *ratiow，变回原图尺寸
 				int top = int((cy - padh - 0.5 * h)*ratioh);
 
-				confidences.push_back((float)max_class_socre);
-				boxes.push_back(cv::Rect(left, top, (int)(w*ratiow), (int)(h*ratioh)));  //（x,y,w,h）
+				confidences.push_back(static_cast<float>(max_class_socre));
+				boxes.push_back(cv::Rect(left, top, static_cast<int>(w*ratiow), static_cast<int>(h*ratioh)));  //（x,y,w,h）
 				classIds.push_back(class_idx);  // 
 			}
 		}
