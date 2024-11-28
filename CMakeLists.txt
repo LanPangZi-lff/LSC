@@ -15,7 +15,6 @@ endif()
 
 cmake_policy(SET CMP0074 NEW)
 
-
 aux_source_directory(./src srcs)
 file(GLOB headers inc/*.h inc/*.hpp)
 include_directories(inc)
@@ -24,29 +23,15 @@ include_directories(inc)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-#CMinpack
-find_package(CMinpack REQUIRED)
-include_directories(${CMinpack_INCLUDE_DIRS})
+# 设置 ONNX Runtime 路径
+set(ONNXRUNTIME_DIR I:/package/CPPLibs/msvc/onnxruntime-win-gpu-x64-1.7.0/onnxruntime-win-gpu-x64-1.7.0)
 
-#CUDA
-find_package(CUDA REQUIRED)
-message(STATUS "lib:${CUDA_LIBRARIES}")
-message(STATUS "inc:${CUDA_INCLUDE_DIRS}")
-include_directories(${CUDA_INCLUDE_DIRS})
-
-# tensorrt
-set(TENSORRT_ROOT_PATH I:/package/CPPLibs/msvc/TensorRT-8.4.3.1.Windows10.x86_64.cuda-11.6.cudnn8.4/TensorRT-8.4.3.1)
-set(TENSORRT_INCLUDE_DIRS ${TENSORRT_ROOT_PATH}/include/)   # 头文件夹
-include_directories(${TENSORRT_INCLUDE_DIRS})
-file(GLOB TENSORRT_LIB ${TENSORRT_ROOT_PATH}/lib/*.lib)
-
-# boost
-find_package(Boost REQUIRED COMPONENTS)
-link_directories(${Boost_LIBRARY_DIRS})
-include_directories(${Boost_INCLUDE_DIRS})
+# 添加 include 和 lib 路径
+include_directories(${ONNXRUNTIME_DIR}/include)
+link_directories(${ONNXRUNTIME_DIR}/lib)
 
 add_executable(LCS ${srcs} ${headers} )
-target_link_libraries(LCS PRIVATE  ${OpenCV_LIBS} cminpack::cminpack ${CUDA_LIBRARIES} ${TENSORRT_LIB})
+target_link_libraries(LCS PRIVATE  ${OpenCV_LIBS}  onnxruntime)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
